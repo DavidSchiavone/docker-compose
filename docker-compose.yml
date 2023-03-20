@@ -1,0 +1,38 @@
+version: "1.0"
+services: #3 services definieren (frontend, backend und mongodb)
+  web: #frontend: ReactJS
+    build: ./frontend
+    depends_on: # frontend depends on backend
+      - api
+    ports: # port weiterleitung
+      - "3000:3000"
+    networks: # gemeinsames netzwerk
+      - network-backend
+  api: #backend: nodejs with express
+    build: ./backend
+    depends_on: # backend depends on db
+      - mongo 
+    ports: # port weiterleitung
+      - "3001:3001" 
+    networks: # gemeinsames netzwerk
+     - network-backend
+
+  mongo:
+    image: mongo:4.4.6 # aeltere Version fuer kompatibilitaet mit ubuntu
+    restart: always
+    volumes: # volume damit daten erhalten bleiben bei neustart
+      - mongodb_data:/data/db
+    environment: # db configs
+      MONGODB_INITDB_ROOT_USERNAME: username
+      MONGODB_INITDB_ROOT_PASSWORD: password
+    # uncomment following lines to access db locally
+    # ports:
+    #   - 27017:27017
+    networks: # gemeinsames netzwerk
+     - network-backend
+
+networks: # gemeinsames netzwerk definieren
+  network-backend:
+
+volumes: # volume definieren
+  mongodb_data:
